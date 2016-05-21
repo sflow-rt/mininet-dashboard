@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Real-time Mininet Dashboard</title>
+  <link rel="stylesheet" href="../../../inc/jquery-ui/jquery-ui.structure.min.css" type="text/css"/>
+  <link rel="stylesheet" href="../../../inc/jquery-ui/jquery-ui.theme.css" type="text/css"/>
+  <link rel="stylesheet" href="../../../inc/stripchart.css" type="text/css"/>
+  <link rel="stylesheet" href="css/app.css" type="text/css"/>
+  <script type="text/javascript" src="../../../inc/jquery.min.js"></script>
+  <script type="text/javascript" src="../../../inc/jquery-ui/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="../../../inc/jquery.stripchart.js"></script>
+  <script type="text/javascript" src="../../../inc/stripchart.js"></script>
+  <script type="text/javascript" src="js/app.js"></script>
+</head>
+<body>
+  <div id="tabs">
+    <span id="clone">
+       <button id="clone_button">New Window</button>
+    </span>
+    <ul>
+      <li><a href="#overall">Charts</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+    <div id="overall">
+      <div id="overall-acc">
+        <div>
+          <h3>Traffic</h3>
+          <div>
+            <div id="topflows" class="trend"></div>
+          </div>
+        </div>
+        <div>
+          <h3>Topology</h3>
+           <div>
+              <div id="links" class="trend"></div>
+              <div id="diameter" class="trend"></div>
+           </div>
+        </div>
+      </div>
+    </div>
+    <div id="about">
+      <p>Simple sFlow-RT real-time Mininet dashboard example using jQuery-UI.</p>
+      <p>Launch Mininet using sflow.py helper script, see <a href="http://blog.sflow.com/2016/05/mininet-flow-analytics.html">Mininet flow analytics</a></p>
+      <p>Click on peaks in the trend charts to see traffic at that time.</p>
+      <h3>REST API</h3>
+      <ul>
+        <li><a href="../scripts/metrics.js/metric/json">Latest Values</a></li>
+        <li><a href="../scripts/metrics.js/trend/json">Trends</a></li>
+        <li><a href="../../../topology/json">Topology</a></li>
+      </ul> 
+    </div>
+  </div>
+</body>
+</html>
