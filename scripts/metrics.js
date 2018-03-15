@@ -47,9 +47,7 @@ function flowCount(flow) {
   return res && res.length > 0 ? res[0].value : 0;
 }
 
-setIntervalHandler(function() {
-  var now = (new Date()).getTime();
-
+setIntervalHandler(function(now) {
   points = {};
   points['diameter'] = topologyDiameter();
 
@@ -57,7 +55,7 @@ setIntervalHandler(function() {
   points['top-5-flows'] = calculateTopN('mn_flow',5,1,points.bps);
   points['top-5-interfaces'] = calculateTopInterfaces('mn_bytes',5); 
 
-  trend.addPoints(points);
+  trend.addPoints(now,points);
 },1);
 
 setHttpHandler(function(req) {
