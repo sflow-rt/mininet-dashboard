@@ -2,6 +2,7 @@ $(function() {
   var restPath =  '../scripts/metrics.js/';
   var dataURL = restPath + 'trend/json';
   var SEP = '_SEP_';
+  var nodes, edges, network, version = null;
 
   var defaults = {
     tab:0,
@@ -73,6 +74,7 @@ $(function() {
       var newIndex = ui.newTab.index();
       setState('tab', newIndex, true);
       $.event.trigger({type:'updateChart'});
+      network.fit();
     },
     create: function(event,ui) {
       $.event.trigger({type:'updateChart'});
@@ -103,7 +105,53 @@ $(function() {
     units: 'Bits per Second'},
   db); 
 
+  function updateTopology(top) {
+    var node, edge, entry, ids, i;
+    if(top.nodes) {
+      for(node in top.nodes) {
+        if(!nodes.get(node)) nodes.add({id:node,label:node}); 
+      }
+    }
+    if(top.links) {
+      for(edge in top.links) {
+        entry = top.links[edge]; 
+        if(!edges.get(edge)) edges.add({id:edge,from:entry.node1,to:entry.node2});
+      }
+    }
+    ids = nodes.getIds();
+    for(i = 0; i < ids.length; i++) {
+      if(!top.nodes || !top.nodes[ids[i]]) nodes.remove({id:ids[i]});
+    }
+    ids = edges.getIds();
+    for(i = 0; i < ids.length; i++) {
+      if(!top.links || !top.links[ids[i]]) edges.remove({id:ids[i]});
+    }
+  }
+
+  function updateNetwork(data) {
+    var ids,i,linkMetrics;
+
+    if(!data || !data.hasOwnProperty('topologyVersion')) return;
+    if(data.topologyVersion == version) {
+      linkMetrics = data.linkMetrics;
+      if(linkMetrics) {
+        ids = edges.getIds();
+        for(i = 0; i < ids.length; i++) {
+          edges.update({id:ids[i],width:linkMetrics[ids[i]] || 1});
+        }
+      } 
+    } else { 
+      $.get('../../../topology/json', function(top) {
+        version = top.version;
+        updateTopology(top);
+      });
+
+      version = data.topologyVersion;
+    }
+  }
+
   function updateData(data) {
+    updateNetwork(data);
     if(!data 
       || !data.trend 
       || !data.trend.times 
@@ -144,9 +192,23 @@ $(function() {
 	
   $(window).resize(function() {
     $.event.trigger({type:'updateChart'});
+    network.fit();
   });
 
   $(document).ready(function() {
+    nodes = new vis.DataSet([]);
+    edges = new vis.DataSet([]);
+
+    var container = $('#vis-network')[0];
+    var data = {nodes:nodes, edges:edges};
+    var options = {
+      interaction: {zoomView:false}
+    };
+    network = new vis.Network(container, data, options);
+    network.on('stabilized', function() {
+      network.fit({animation:{duration:1000}});
+    });
+
     pollTrends();
   });
 });

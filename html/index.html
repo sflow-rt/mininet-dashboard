@@ -7,11 +7,13 @@
   <link rel="stylesheet" href="../../../inc/jquery-ui/jquery-ui.structure.min.css" type="text/css"/>
   <link rel="stylesheet" href="../../../inc/jquery-ui/jquery-ui.theme.css" type="text/css"/>
   <link rel="stylesheet" href="../../../inc/stripchart.css" type="text/css"/>
+  <link rel="stylesheet" href="css/vis-network.min.css" type="text/css">
   <link rel="stylesheet" href="css/app.css" type="text/css"/>
   <script type="text/javascript" src="../../../inc/jquery.min.js"></script>
   <script type="text/javascript" src="../../../inc/jquery-ui/jquery-ui.min.js"></script>
   <script type="text/javascript" src="../../../inc/jquery.stripchart.js"></script>
   <script type="text/javascript" src="../../../inc/stripchart.js"></script>
+  <script type="text/javascript" src="js/vis-network.min.js"></script>
   <script type="text/javascript" src="js/app.js"></script>
 </head>
 <body>
@@ -21,6 +23,7 @@
     </span>
     <ul>
       <li><a href="#overall">Charts</a></li>
+      <li><a href="#topology">Topology</a></li>
       <li><a href="#about">About</a></li>
     </ul>
     <div id="overall">
@@ -40,9 +43,14 @@
         </div>
       </div>
     </div>
+    <div id="topology">
+       <div id="vis-network"></div>
+    </div>
     <div id="about">
-      <p>Simple sFlow-RT real-time Mininet dashboard example using jQuery-UI.</p>
-      <p>Launch Mininet using sflow.py helper script, see <a href="http://blog.sflow.com/2016/05/mininet-flow-analytics.html">Mininet flow analytics</a></p>
+      <p>Simple <a href="http://sflow-rt.com">sFlow-RT</a> real-time Mininet dashboard, using
+      <a href="http://blog.sflow.com/2016/05/mininet-flow-analytics.html">Mininet flow analytics</a></p>
+      <p>Launch Mininet using sflow.py helper script:</p>
+      <pre>sudo mn --custom sflow-rt/extras/sflow.py --link tc,bw=10 --topo tree,depth=2,fanout=2</pre>
       <p>Click on peaks in the trend charts to see traffic at that time.</p>
       <h3>REST API</h3>
       <ul>

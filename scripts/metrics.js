@@ -58,14 +58,30 @@ setIntervalHandler(function(now) {
   trend.addPoints(now,points);
 },1);
 
+function getLinkMetrics() {
+  var i,linkNames,vals,res = {};
+  linkNames = topologyLinkNames();
+  if(!linkNames) return res;
+  for(i = 0; i < linkNames.length; i++) {
+    vals = topologyLinkMetric(linkNames[i],'mn_bytes');
+    res[linkNames[i]] = Math.max(1,Math.log10((vals[0].metricValue || 0) + (vals[1].metricValue || 0)));
+  }
+  return res;
+}
+
 setHttpHandler(function(req) {
-  var result, key, name, path = req.path;
+  var result, version, key, name, path = req.path;
   if(!path || path.length == 0) throw "not_found";
      
   switch(path[0]) {
     case 'trend':
       if(path.length > 1) throw "not_found"; 
       result = {};
+      version = topologyVersion();
+      if(version != null) {
+        result.topologyVersion = version;
+        result.linkMetrics = getLinkMetrics();
+      }
       result.trend = req.query.after ? trend.after(parseInt(req.query.after)) : trend;
       break;
     case 'metric':
