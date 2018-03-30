@@ -129,25 +129,22 @@ $(function() {
   }
 
   function updateNetwork(data) {
-    var ids,i,linkMetrics;
+    var ids,i,links,width;
 
-    if(!data || !data.hasOwnProperty('topologyVersion')) return;
-    if(data.topologyVersion == version) {
-      linkMetrics = data.linkMetrics;
-      if(linkMetrics) {
-        ids = edges.getIds();
-        for(i = 0; i < ids.length; i++) {
-          edges.update({id:ids[i],width:linkMetrics[ids[i]] || 1});
-        }
-      } 
-    } else { 
-      $.get('../../../topology/json', function(top) {
-        version = top.version;
-        updateTopology(top);
-      });
+    if(!data || !data.topologyMetrics) return;
 
-      version = data.topologyVersion;
+    if(data.topologyMetrics.version != version) {
+      updateTopology(data.topologyMetrics);
+      version = data.topologyMetrics.version;
     }
+    links = data.topologyMetrics.links;
+    if(links) {
+      ids = edges.getIds();
+      for(i = 0; i < ids.length; i++) {
+        width = links[ids[i]] ? links[ids[i]].width : 1;
+        edges.update({id:ids[i],width:width});
+      }
+    } 
   }
 
   function updateData(data) {
