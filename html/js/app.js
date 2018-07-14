@@ -192,20 +192,18 @@ $(function() {
     network.fit();
   });
 
-  $(document).ready(function() {
-    nodes = new vis.DataSet([]);
-    edges = new vis.DataSet([]);
+  nodes = new vis.DataSet([]);
+  edges = new vis.DataSet([]);
 
-    var container = $('#vis-network')[0];
-    var data = {nodes:nodes, edges:edges};
-    var options = {
-      interaction: {zoomView:false}
-    };
-    network = new vis.Network(container, data, options);
-    network.on('stabilized', function() {
-      network.fit({animation:{duration:1000}});
-    });
-
-    pollTrends();
+  var container = $('#vis-network')[0];
+  var data = {nodes:nodes, edges:edges};
+  var options = {
+    interaction: {zoomView:false}
+  };
+  network = new vis.Network(container, data, options);
+  network.on('stabilized', function() {
+    network.fit({animation:{duration:1000}});
   });
+
+  pollTrends();
 });
