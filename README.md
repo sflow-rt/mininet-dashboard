@@ -2,14 +2,17 @@
 
 Dashboard displaying real-time traffic information from Mininet.
 
-http://blog.sflow.com/2016/05/mininet-dashboard.html
+https://blog.sflow.com/2016/05/mininet-dashboard.html
+
+https://blog.sflow.com/2018/03/mininet-weathermap.html
 
 ## To install
 
-1. Copy files to the sFlow-RT app directory.
-2. Restart sFlow-RT to load application.
+1. [Download sFlow-RT](https://sflow-rt.com/download.php)
+2. Run command: `sflow-rt/get-app.sh sflow-rt mininet-dashboard`
+3. Restart sFlow-RT
 
 Online help is available through web UI.
 
 For more information, visit:
-http://www.sFlow-RT.com
+https://sFlow-RT.com
