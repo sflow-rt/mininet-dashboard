@@ -1,15 +1,15 @@
 // author: InMon
-// version: 1.0
-// date: 5/21/2016
-// description: Mininet Dashboard Example
+// version: 1.1
+// date: 9/22/2020
+// description: Mininet Dashboard
 
 include(scriptdir()+'/inc/trend.js');
 
-var points, other='-other-', SEP='_SEP_', trend = new Trend(300,1);
+var points, other='-other-', trend = new Trend(300,1);
 
 // define flows, prepend application name to avoid name clashes with other apps
-setFlow('mn_bytes',{value:'bytes',t:2,fs:SEP});
-setFlow('mn_flow',{keys:'ipsource,ipdestination,ipprotocol,or:tcpsourceport:udpsourceport:icmptype,or:tcpdestinationport:udpdestinationport:icmpcode',value:'bytes',t:2,fs:SEP});
+setFlow('mn_bytes',{value:'bytes',t:2});
+setFlow('mn_flow',{keys:'ipsource,ipdestination,ipprotocol,or:tcpsourceport:udpsourceport:icmptype,or:tcpdestinationport:udpdestinationport:icmpcode',value:'bytes',t:2});
 
 function calculateTopN(metric,n,minVal,total_bps) {     
   var total, top, topN, i, bps;
@@ -35,7 +35,7 @@ function calculateTopInterfaces(metric,n) {
       var val = top[i][0];
       var port = topologyInterfaceToPort(val.agent,val.dataSource);
       if(port && port.node && port.port) {
-        topN[port.node + SEP + port.port] = val.metricValue * 8; 
+        topN[port.node + ',' + port.port] = val.metricValue * 8; 
       }
     }
   }

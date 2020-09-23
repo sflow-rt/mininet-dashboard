@@ -1,97 +1,51 @@
 $(function() { 
   var restPath =  '../scripts/metrics.js/';
   var dataURL = restPath + 'trend/json';
-  var SEP = '_SEP_';
-  var nodes, edges, network, version = null;
+  var version = null;
 
-  var defaults = {
-    tab:0,
-    overall0:'show',
-    overall1:'show',
+  var nodes = new vis.DataSet([]);
+  var edges = new vis.DataSet([]);
+
+  var container = $('#vis-network')[0];
+  var data = {nodes:nodes, edges:edges};
+  var options = {
+    interaction: { zoomView:false }
   };
-
-  var state = {};
-  $.extend(state,defaults);
-
-  function createQuery(params) {
-    var query, key, value;
-    for(key in params) {
-      value = params[key];
-      if(value == defaults[key]) continue;
-      if(query) query += '&';
-      else query = '';
-      query += encodeURIComponent(key)+'='+encodeURIComponent(value);
-    }
-    return query;
-  }
-
-  function getState(key, defVal) {
-    return window.sessionStorage.getItem('mn_'+key) || state[key] || defVal;
-  }
-
-  function setState(key, val, showQuery) {
-    state[key] = val;
-    window.sessionStorage.setItem('mn_'+key, val);
-    if(showQuery) {
-      var query = createQuery(state);
-      window.history.replaceState({},'',query ? '?' + query : './');
-    }
-  }
-
-  function setQueryParams(query) {
-    var vars, params, i, pair;
-    vars = query.split('&');
-    params = {};
-    for(i = 0; i < vars.length; i++) {
-      pair = vars[i].split('=');
-      if(pair.length == 2) setState(decodeURIComponent(pair[0]), decodeURIComponent(pair[1]),false);
-    }
-  }
-
-  var search = window.location.search;
-  if(search) setQueryParams(search.substring(1));
-
-  $('#clone_button').button({icons:{primary:'ui-icon-newwin'},text:false}).click(function() {
-    window.open(window.location);
+  var network = new vis.Network(container, data, options);
+  network.on('stabilized', function() {
+    network.fit({animation:{duration:1000}});
   });
 
-  $('#overall-acc > div').each(function(idx) {
-    $(this).accordion({
-      heightStyle:'content',
-      collapsible: true,
-      active: getState('overall'+idx, 'hide') == 'show' ? 0 : false,
-      activate: function(event, ui) {
-        var newIndex = $(this).accordion('option','active');
-        setState('overall'+idx, newIndex === 0 ? 'show' : 'hide', true);
-        $.event.trigger({type:'updateChart'});
-      }
-    });
+
+  function setNav(target) {
+    $('.navbar .nav-item a[data-target="'+target+'"]').parent().addClass('active').siblings().removeClass('active');
+    $('#'+target).show().siblings().hide();
+  }
+
+  setNav(window.sessionStorage.getItem('mn_nav') || 'charts');
+
+  $('.navbar .nav-link').on('click', function(e) {
+    var selected = $(this).data('target');
+    setNav(selected);
+    window.sessionStorage.setItem('mn_nav',selected);
+    if('charts' === selected) $.event.trigger({type:'updateChart'});
+    else if('topology' === selected) network.fit();
   });
 
-  $('#tabs').tabs({
-    active: getState('tab', 0),
-    activate: function(event, ui) {
-      var newIndex = ui.newTab.index();
-      setState('tab', newIndex, true);
-      $.event.trigger({type:'updateChart'});
-      network.fit();
-    },
-    create: function(event,ui) {
-      $.event.trigger({type:'updateChart'});
-    }
-  }); 
+  $('a[href="#"]').on('click', function(e) {
+    e.preventDefault();
+  });
 
   var db = {};
   $('#diameter').chart({
     type: 'trend',
     metrics: ['diameter'],
     stack:false,
-    units: 'Topology Diameter'},
+    units: 'Diameter'},
   db);
   $('#topflows').chart({
     type: 'topn',
     stack: true,
-    sep: SEP,
     metric: 'top-5-flows',
     legendHeadings: ['Src Addr','Dst Addr','Proto','Src Prt','Dst Prt'],
     units: 'Bits per Second'},
@@ -99,7 +53,6 @@ $(function() {
   $('#links').chart({
     type: 'topn',
     stack: false,
-    sep: SEP,
     metric: 'top-5-interfaces',
     legendHeadings: ['Switch','Port'],
     units: 'Bits per Second'},
@@ -172,38 +125,22 @@ $(function() {
     $.event.trigger({type:'updateChart'});
   }
 
-  function pollTrends() {
-    $.ajax({
-      url: dataURL,
-      data: db.trend && db.trend.end ? {after:db.trend.end.getTime()} : null,
-      success: function(data) {
-        updateData(data);
-        setTimeout(pollTrends, 1000);
-      },
-      error: function(result,status,errorThrown) {
-        setTimeout(pollTrends,5000);
-      },
-      timeout: 60000
-    });
-  };
-	
   $(window).resize(function() {
     $.event.trigger({type:'updateChart'});
     network.fit();
   });
 
-  nodes = new vis.DataSet([]);
-  edges = new vis.DataSet([]);
-
-  var container = $('#vis-network')[0];
-  var data = {nodes:nodes, edges:edges};
-  var options = {
-    interaction: {zoomView:false}
-  };
-  network = new vis.Network(container, data, options);
-  network.on('stabilized', function() {
-    network.fit({animation:{duration:1000}});
-  });
-
-  pollTrends();
+  (function pollTrends() {
+    $.ajax({
+      url: dataURL,
+      data: db.trend && db.trend.end ? {after:db.trend.end.getTime()} : null,
+      success: function(data) {
+        updateData(data);
+      },
+      complete: function(result,status,errorThrown) {
+        setTimeout(pollTrends,1000);
+      },
+      timeout: 60000
+    });
+  })();
 });

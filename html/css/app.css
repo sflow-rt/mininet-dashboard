@@ -1,11 +1,6 @@
-body { font-family: Verdana,Arial,sans-serif; }
-#clone { float: right; padding: .6em; position: relative; z-index: 1; }
-#clone_button { height: 18px; }
-#tabs { margin: 5px; min-height: 400px; font-size:80%;}
+main { min-height: 300px; }
 .trend { width:100%; height:150px; }
-div.slider {
-    display: none;
-    padding-left:50px;
-    background-color:white;
-}
 #vis-network { height:550px; }
+#vis-network .vis-network:focus{
+  outline: none;
+}
